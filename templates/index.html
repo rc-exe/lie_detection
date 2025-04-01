@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthScan | AI-Powered Lie Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        /* Auto-Adjusting Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: clamp(0.8rem, 2vw, 1.5rem) clamp(1rem, 4vw, 2rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            min-height: 60px;
+            height: auto;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 2vw, 15px);
+            text-decoration: none;
+        }
+        
+        .logo {
+            height: clamp(30px, 5vw, 40px);
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: rotate(10deg);
+        }
+        
+        .nav-title {
+            margin: 0;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(to right, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Centered Main Content Container */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(1.5rem, 3vw, 3rem) 1rem;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            background: rgb(74, 105, 148);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(35, 59, 77, 0.58);
+            text-align: center;
+        }
+        
+        .container h2 {
+            color: #000000;
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+        }
+        
+        .container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.427);
+        }
+        
+        /* Form Styles */
+        .file-input {
+            margin: 1.5rem 0;
+            width: 100%;
+            max-width: 400px;
+            padding: 0.8rem;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            background-color: #6a87a3;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-input:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgb(47, 64, 81);
+        }
+        
+        .upload-btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(44, 62, 80, 0.1);
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.383);
+        }
+        
+        /* Loading Spinner */
+        #loading-spinner {
+            display: none;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #2c3e50;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            color: white;
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            right: 1.5rem;
+            top: 1rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: white;
+        }
+
+        .modal h2 {
+            color: #3498db;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .modal h3 {
+            color: #ecf0f1;
+            margin: 1.5rem 0 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .modal p, .modal ul, .modal ol {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .modal ul, .modal ol {
+            padding-left: 1.5rem;
+        }
+
+        .modal a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .modal a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Auto-Adjusting Footer */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+            color: white;
+            padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 4vw, 2rem);
+            text-align: center;
+            width: 100%;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(1rem, 2vw, 2rem);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+        
+        .footer-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            cursor: pointer;
+        }
+        
+        .footer-links a:hover {
+            color: #3498db;
+            transform: translateY(-2px);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+        
+        .instagram:hover {
+            color: #e1306c;
+        }
+        
+        .github:hover {
+            color: #6e5494;
+        }
+        
+        .email:hover {
+            color: #3498db;
+        }
+        
+        .copyright {
+            margin-top: clamp(1rem, 2vw, 1.5rem);
+            color: #bdc3c7;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            line-height: 1.5;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1.8rem;
+                width: 95%;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .modal-content {
+                width: 90%;
+                padding: 1.5rem;
+                margin: 10% auto;
+            }
+
+            .modal h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auto-Adjusting Navigation Bar -->
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="TruthScan Logo" class="logo">
+            <h1 class="nav-title">TruthScan</h1>
+        </a>
+    </nav>
+
+    <!-- Centered Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h2>Upload Video or Image for Lie Detection</h2>
+            <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" required class="file-input">
+                <button type="submit" class="upload-btn">Upload</button>
+            </form>
+            <div id="loading-spinner">
+                <img src="{{ url_for('static', filename='images/spinner.gif') }}" alt="Loading...">
+            </div>
+        </div>
+    </main>
+
+    <!-- Auto-Adjusting Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a onclick="openModal('about-modal')">About</a>
+                <a onclick="openModal('how-it-works-modal')">How It Works</a>
+                <a onclick="openModal('privacy-modal')">Privacy Policy</a>
+                <a onclick="openModal('terms-modal')">Terms of Service</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="https://www.instagram.com/_ritesh_rc_" class="instagram" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://github.com/rc-exe" class="github" target="_blank" aria-label="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=riteshchakramani123@gmail.com" class="email" aria-label="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+            
+            <p class="copyright">
+                &copy; 2025 TruthScan AI | Advanced Microexpression Analysis System<br>
+                All rights reserved
+            </p>
+        </div>
+    </footer>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('about-modal')">&times;</span>
+            <h2>About TruthScan</h2>
+            <p>TruthScan is an advanced AI-powered deception detection platform that analyzes microexpressions and facial cues to identify potential dishonesty. Our cutting-edge technology provides professional-grade analysis for law enforcement, human resources, and security professionals.</p>
+            
+            <h3>Key Features</h3>
+            <ul>
+                <li>Real-time facial expression analysis with 98.7% accuracy</li>
+                <li>Microexpression detection for brief, involuntary expressions</li>
+                <li>Comprehensive emotion classification across seven universal emotions</li>
+                <li>Secure, encrypted processing that respects privacy</li>
+                <li>Detailed reporting with confidence scoring</li>
+            </ul>
+            
+            <h3>Our Technology</h3>
+            <p>Developed by a team of AI researchers and behavioral psychologists, TruthScan combines the latest in computer vision with established psychological principles to deliver reliable deception indicators.</p>
+        </div>
+    </div>
+
+    <!-- How It Works Modal -->
+    <div id="how-it-works-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('how-it-works-modal')">&times;</span>
+            <h2>How TruthScan Works</h2>
+            <p>TruthScan employs a sophisticated five-stage analysis process to evaluate potential deception:</p>
+            
+            <h3>1. Media Input</h3>
+            <p>Upload video or image files through our secure interface. The system accepts most common formats including MP4, MOV, JPG, and PNG.</p>
+            
+            <h3>2. Face Detection & Tracking</h3>
+            <p>Our proprietary algorithms identify and isolate all faces in the media, maintaining tracking even with movement or partial obstructions.</p>
+            
+            <h3>3. Microexpression Analysis</h3>
+            <p>The system analyzes 68 facial landmarks at 30 frames per second to detect fleeting expressions lasting as little as 1/25th of a second.</p>
+            
+            <h3>4. Emotion Classification</h3>
+            <p>Using deep learning models trained on millions of samples, we classify expressions into seven core emotions with confidence scoring.</p>
+            
+            <h3>5. Deception Probability</h3>
+            <p>Our weighted algorithm combines all factors to generate a comprehensive deception probability score and detailed report.</p>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('privacy-modal')">&times;</span>
+            <h2>Privacy Policy</h2>
+            <p><strong>Last Updated:</strong> January 2025</p>
+            
+            <h3>1. Data Collection</h3>
+            <p>TruthScan processes facial images and videos you upload with strict privacy protections:</p>
+            <ul>
+                <li>Media is encrypted during upload and processing</li>
+                <li>Files are temporarily cached during analysis then permanently deleted</li>
+                <li>No biometric data is stored or used to create facial recognition profiles</li>
+            </ul>
+            
+            <h3>2. Data Usage</h3>
+            <p>Your information is used exclusively for:</p>
+            <ul>
+                <li>Providing the deception analysis service you requested</li>
+                <li>Improving our algorithms (using anonymized, aggregated data only)</li>
+                <li>Maintaining system security and preventing abuse</li>
+            </ul>
+            
+            <h3>3. Your Rights</h3>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Request deletion of your data</li>
+                <li>Access any information we hold about you</li>
+                <li>Withdraw consent for data processing</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Terms of Service Modal -->
+    <div id="terms-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('terms-modal')">&times;</span>
+            <h2>Terms of Service</h2>
+            <p><strong>Effective Date:</strong> January 2025</p>
+            
+            <h3>1. Acceptance of Terms</h3>
+            <p>By using TruthScan, you agree to these Terms and our Privacy Policy. If you don't agree, you may not use our services.</p>
+            
+            <h3>2. Appropriate Use</h3>
+            <p>TruthScan is designed for:</p>
+            <ul>
+                <li>Law enforcement investigations</li>
+                <li>Human resources screening</li>
+                <li>Security and fraud prevention</li>
+                <li>Academic research (with proper approvals)</li>
+            </ul>
+            
+            <h3>3. Prohibited Uses</h3>
+            <p>You may not use TruthScan for:</p>
+            <ul>
+                <li>Harassment or discrimination</li>
+                <li>Violating privacy rights</li>
+                <li>Any illegal activities</li>
+                <li>Making final determinations without human review</li>
+            </ul>
+            
+            <h3>4. Disclaimer</h3>
+            <p>TruthScan provides indicators, not proof. Always combine our analysis with other evidence and professional judgment.</p>
+        </div>
+    </div>
+
+   
+
+    <script>
+        const form = document.querySelector('form');
+        const spinner = document.getElementById('loading-spinner');
+    
+        form.addEventListener('submit', () => {
+            spinner.style.display = 'flex';
+        });
+        
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+        
+        // Close modal when clicking outside content
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>

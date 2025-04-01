@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthScan | Detection Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        /* Auto-Adjusting Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: clamp(0.8rem, 2vw, 1.5rem) clamp(1rem, 4vw, 2rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            min-height: 60px;
+            height: auto;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 2vw, 15px);
+            text-decoration: none;
+        }
+        
+        .logo {
+            height: clamp(30px, 5vw, 40px);
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: rotate(10deg);
+        }
+        
+        .nav-title {
+            margin: 0;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(to right, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Main Content Area */
+        .container {
+            flex: 1;
+            width: 90%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: rgb(74, 105, 148);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(35, 59, 77, 0.58);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.427);
+        }
+        
+        .container h2 {
+            color: #000000;
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+        }
+        
+        .container p {
+            color: #ffffff;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .action-btn {
+            display: inline-block;
+            padding: 0.8rem 1.8rem;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(44, 62, 80, 0.1);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(2, 2, 2, 0.519);
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #2c3e50;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            color: white;
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            right: 1.5rem;
+            top: 1rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: white;
+        }
+
+        .modal h2 {
+            color: #3498db;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .modal h3 {
+            color: #ecf0f1;
+            margin: 1.5rem 0 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .modal p, .modal ul, .modal ol {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .modal ul, .modal ol {
+            padding-left: 1.5rem;
+        }
+
+        .modal a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .modal a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Auto-Adjusting Footer - Matching Index Page */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+            color: white;
+            padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 4vw, 2rem);
+            text-align: center;
+            width: 100%;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(1rem, 2vw, 2rem);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+        
+        .footer-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            cursor: pointer;
+        }
+        
+        .footer-links a:hover {
+            color: #3498db;
+            transform: translateY(-2px);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+        
+        .instagram:hover {
+            color: #e1306c;
+        }
+        
+        .github:hover {
+            color: #6e5494;
+        }
+        
+        .email:hover {
+            color: #3498db;
+        }
+        
+        .copyright {
+            margin-top: clamp(1rem, 2vw, 1.5rem);
+            color: #bdc3c7;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            line-height: 1.5;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1.8rem;
+                width: 95%;
+            }
+            
+            .action-btn {
+                padding: 0.7rem 1.5rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .modal-content {
+                width: 90%;
+                padding: 1.5rem;
+                margin: 10% auto;
+            }
+
+            .modal h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auto-Adjusting Navigation Bar -->
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="navbar-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="TruthScan Logo" class="logo">
+            <h1 class="nav-title">TruthScan</h1>
+        </a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2>Emotion Detected: <span style="color: #e74c3c;">{{ result }}</span></h2>
+        <p>The analysis was successfully processed. Our system detected the dominant emotion shown above.</p>
+        <button onclick="window.location.href='{{ url_for('index') }}'" class="action-btn">
+            <i class="fas fa-arrow-left"></i> Analyze Another File
+        </button>
+    </div>
+
+    <!-- Auto-Adjusting Footer - Matching Index Page -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a onclick="openModal('about-modal')">About</a>
+                <a onclick="openModal('how-it-works-modal')">How It Works</a>
+                <a onclick="openModal('privacy-modal')">Privacy Policy</a>
+                <a onclick="openModal('terms-modal')">Terms of Service</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="https://www.instagram.com/_ritesh_rc_" class="instagram" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://github.com/rc-exe" class="github" target="_blank" aria-label="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=riteshchakramani123@gmail.com" class="email" aria-label="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+            
+            <p class="copyright">
+                &copy; 2025 TruthScan AI | Advanced Microexpression Analysis System<br>
+                All rights reserved
+            </p>
+        </div>
+    </footer>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('about-modal')">&times;</span>
+            <h2>About TruthScan</h2>
+            <p>TruthScan is an advanced AI-powered deception detection system that analyzes microexpressions and facial cues to identify potential dishonesty. Our cutting-edge technology provides insights into emotional responses that may indicate deception.</p>
+            
+            <h3>Key Features</h3>
+            <ul>
+                <li>Real-time facial expression analysis</li>
+                <li>Microexpression detection technology</li>
+                <li>Comprehensive emotion classification</li>
+                <li>Intuitive results visualization</li>
+                <li>Secure and private processing</li>
+            </ul>
+            
+            <h3>Our Mission</h3>
+            <p>We aim to provide reliable, science-based tools to help identify deceptive behavior while maintaining the highest ethical standards and respect for privacy.</p>
+        </div>
+    </div>
+
+    <!-- How It Works Modal -->
+    <div id="how-it-works-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('how-it-works-modal')">&times;</span>
+            <h2>How TruthScan Works</h2>
+            <p>TruthScan uses a sophisticated multi-stage analysis process to evaluate potential deception:</p>
+            
+            <h3>1. Face Detection</h3>
+            <p>Our system first identifies and isolates faces in the provided media using advanced computer vision algorithms.</p>
+            
+            <h3>2. Facial Landmark Analysis</h3>
+            <p>We map 68 distinct facial points to track even the most subtle micro-movements that often occur involuntarily.</p>
+            
+            <h3>3. Microexpression Detection</h3>
+            <p>The system analyzes brief, involuntary facial expressions that typically last less than 1/25th of a second.</p>
+            
+            <h3>4. Emotion Classification</h3>
+            <p>We evaluate seven universal emotions: anger, contempt, disgust, fear, happiness, sadness, and surprise.</p>
+            
+            <h3>5. Deception Probability</h3>
+            <p>All factors are combined using our proprietary algorithm to calculate a deception probability score.</p>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('privacy-modal')">&times;</span>
+            <h2>Privacy Policy</h2>
+            <p><strong>Last Updated:</strong> January 2025</p>
+            
+            <h3>Data Collection</h3>
+            <p>TruthScan processes the facial images and videos you upload, but we implement strict privacy protections:</p>
+            <ul>
+                <li>Media files are processed in memory and not permanently stored</li>
+                <li>Analysis results are only retained during your active session</li>
+                <li>You control whether to save or share any results</li>
+            </ul>
+            
+            <h3>Data Usage</h3>
+            <p>Your data is used exclusively for:</p>
+            <ul>
+                <li>Providing the deception analysis service you requested</li>
+                <li>Improving our algorithms (using anonymized, aggregated data only)</li>
+                <li>Maintaining system security and integrity</li>
+            </ul>
+            
+            <h3>Security Measures</h3>
+            <p>We implement industry-standard security protocols including encryption and secure data handling practices to protect your information.</p>
+        </div>
+    </div>
+
+    <!-- Terms of Service Modal -->
+    <div id="terms-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('terms-modal')">&times;</span>
+            <h2>Terms of Service</h2>
+            <p><strong>Effective Date:</strong> January 2025</p>
+            
+            <h3>1. Acceptance of Terms</h3>
+            <p>By using TruthScan, you agree to be bound by these Terms of Service and our Privacy Policy.</p>
+            
+            <h3>2. Service Description</h3>
+            <p>TruthScan provides AI-based emotion and deception analysis. Results should be considered as indicators rather than definitive proof of deception.</p>
+            
+            <h3>3. User Responsibilities</h3>
+            <p>You agree to use TruthScan only for lawful purposes and in compliance with all applicable laws and regulations.</p>
+            
+            <h3>4. Limitations</h3>
+            <p>TruthScan is designed as a decision-support tool and should not replace professional judgment or be used as sole evidence.</p>
+            
+            <h3>5. Modifications</h3>
+            <p>We reserve the right to modify these terms at any time. Continued use constitutes acceptance of the updated terms.</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.querySelector('form');
+        const spinner = document.getElementById('loading-spinner');
+    
+        form.addEventListener('submit', () => {
+            spinner.style.display = 'flex';
+        });
+        
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+        
+        // Close modal when clicking outside content
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>
