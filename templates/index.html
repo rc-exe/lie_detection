@@ -6,7 +6,29 @@
     <title>TruthScan | AI-Powered Lie Detection</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #06d6a0;
+            --primary-dark: #05b38a;
+            --secondary: #118ab2;
+            --accent: #73fbd3;
+            --dark: #0a192f;
+            --darker: #020c1b;
+            --light: #f8f9fa;
+            --gray: #ccd6f6;
+            --light-gray: #e6f1ff;
+            --success: #4cc9f0;
+            --warning: #ef476f;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.2);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
         /* Reset and Base Styles */
         * {
             margin: 0;
@@ -18,61 +40,77 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--dark);
+            color: var(--gray);
+            line-height: 1.6;
         }
         
-        /* Auto-Adjusting Navbar */
+        h1, h2, h3, h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        /* Glassmorphism Navbar */
         .navbar {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            color: white;
-            padding: clamp(0.8rem, 2vw, 1.5rem) clamp(1rem, 4vw, 2rem);
+            background: rgba(10, 25, 47, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--light);
+            padding: 1rem clamp(1rem, 5vw, 3rem);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             position: sticky;
             top: 0;
             z-index: 1000;
             width: 100%;
-            min-height: 60px;
-            height: auto;
+            border-bottom: 1px solid rgba(6, 214, 160, 0.1);
         }
         
         .navbar-brand {
             display: flex;
             align-items: center;
-            gap: clamp(10px, 2vw, 15px);
+            gap: 0.75rem;
             text-decoration: none;
+            transition: var(--transition);
         }
         
         .logo {
-            height: clamp(30px, 5vw, 40px);
-            transition: transform 0.3s;
+            height: 2.5rem;
+            transition: transform 0.3s ease;
         }
         
         .logo:hover {
-            transform: rotate(10deg);
+            transform: rotate(15deg) scale(1.1);
         }
         
         .nav-title {
             margin: 0;
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-size: 1.5rem;
             font-weight: 700;
-            color: white;
-            background: linear-gradient(to right, #ffffff, #f0f0f0);
+            color: var(--primary);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        /* Centered Main Content Container */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: clamp(1.5rem, 3vw, 3rem) 1rem;
+      
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(6, 214, 160, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(17, 138, 178, 0.1) 0%, transparent 30%);
+            z-index: -1;
         }
         
         .container {
@@ -80,58 +118,172 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 2.5rem;
-            background: rgb(74, 105, 148);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(35, 59, 77, 0.58);
+            background: rgba(10, 25, 47, 0.7);
+            border-radius: var(--border-radius);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(6, 214, 160, 0.1);
             text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(6, 214, 160, 0.05) 0%,
+                rgba(10, 25, 47, 0) 50%,
+                rgba(17, 138, 178, 0.05) 100%
+            );
+            z-index: -1;
         }
         
         .container h2 {
-            color: #000000;
+            color: var(--light);
             margin-bottom: 1.5rem;
-            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .container h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
         }
         
         .container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.427);
+            transform: translateY(-5px);
+            box-shadow: 
+                0 15px 30px rgba(6, 214, 160, 0.15),
+                inset 0 0 0 1px rgba(6, 214, 160, 0.2);
         }
         
-        /* Form Styles */
-        .file-input {
-            margin: 1.5rem 0;
+        /* Modern Form Styles */
+        .upload-container {
+            margin: 2rem 0;
             width: 100%;
-            max-width: 400px;
-            padding: 0.8rem;
-            border: 2px dashed #3498db;
-            border-radius: 8px;
-            background-color: #6a87a3;
-            cursor: pointer;
-            transition: all 0.3s;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        .file-input:hover {
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-input-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            border: 2px dashed var(--primary);
+            border-radius: var(--border-radius);
+            background-color: rgba(6, 214, 160, 0.05);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-input-label:hover {
+            background-color: rgba(6, 214, 160, 0.1);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgb(47, 64, 81);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+        
+        .file-input-label i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .file-input-label .text {
+            font-size: 1rem;
+            color: var(--light);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .file-input-label .subtext {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--primary);
+            display: none;
         }
         
         .upload-btn {
-            display: inline-block;
-            padding: 0.8rem 2rem;
-            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
-            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--darker);
             border: none;
-            border-radius: 30px;
+            border-radius: 50px;
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 8px rgba(44, 62, 80, 0.1);
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(6, 214, 160, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
         }
         
         .upload-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.383);
+            box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4);
+            color: var(--darker);
+        }
+        
+        .upload-btn:hover::before {
+            left: 100%;
         }
         
         /* Loading Spinner */
@@ -141,7 +293,20 @@
             margin-top: 2rem;
         }
         
-        /* Modal Styles */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(6, 214, 160, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Modern Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -151,72 +316,148 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             overflow: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.show {
+            opacity: 1;
         }
 
         .modal-content {
-            background-color: #2c3e50;
+            background: rgba(10, 25, 47, 0.95);
             margin: 5% auto;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 80%;
-            max-width: 800px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            color: white;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            width: 85%;
+            max-width: 700px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(6, 214, 160, 0.2);
+            color: var(--light);
             position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            border: 1px solid rgba(6, 214, 160, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .close-btn {
-            color: #aaa;
+            color: var(--gray);
             position: absolute;
             right: 1.5rem;
-            top: 1rem;
+            top: 1.5rem;
             font-size: 1.8rem;
             font-weight: bold;
             cursor: pointer;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
 
         .close-btn:hover {
-            color: white;
+            color: var(--warning);
+            background-color: rgba(239, 71, 111, 0.1);
         }
 
         .modal h2 {
-            color: #3498db;
+            color: var(--primary);
             margin-bottom: 1.5rem;
             font-size: 1.8rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .modal h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
         }
 
         .modal h3 {
-            color: #ecf0f1;
-            margin: 1.5rem 0 0.8rem;
+            color: var(--light);
+            margin: 2rem 0 1rem;
             font-size: 1.3rem;
         }
 
         .modal p, .modal ul, .modal ol {
             margin-bottom: 1rem;
-            line-height: 1.6;
+            line-height: 1.7;
+            color: var(--gray);
         }
 
         .modal ul, .modal ol {
             padding-left: 1.5rem;
         }
+        
+        .modal ul li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .modal ul li::before {
+            content: '•';
+            color: var(--primary);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
 
         .modal a {
-            color: #3498db;
+            color: var(--primary);
             text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
         }
 
         .modal a:hover {
+            color: var(--accent);
             text-decoration: underline;
         }
         
-        /* Auto-Adjusting Footer */
+        /* Gradient Footer */
         .footer {
-            background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
             color: white;
-            padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 4vw, 2rem);
+            padding: 3rem clamp(1rem, 5vw, 3rem);
             text-align: center;
             width: 100%;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid rgba(218, 232, 228, 0.1);
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2306d6a0' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
         }
         
         .footer-content {
@@ -224,77 +465,112 @@
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr;
-            gap: clamp(1rem, 2vw, 2rem);
+            gap: 2rem;
+            position: relative;
         }
         
         .footer-links {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: clamp(1rem, 2vw, 1.5rem);
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
         
         .footer-links a {
-            color: #ecf0f1;
+            color: var(--light-gray);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: var(--transition);
             font-weight: 500;
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-size: 1rem;
             cursor: pointer;
+            position: relative;
+            padding: 0.25rem 0;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
         }
         
         .footer-links a:hover {
-            color: #3498db;
-            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
         }
         
         .social-links {
             display: flex;
             justify-content: center;
-            gap: clamp(1rem, 2vw, 1.5rem);
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
         
         .social-links a {
             color: white;
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
-            transition: all 0.3s;
+            font-size: 1.25rem;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid rgba(6, 214, 160, 0.2);
         }
         
         .social-links a:hover {
             transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(6, 214, 160, 0.2);
+            background: rgba(6, 214, 160, 0.2);
         }
         
         .instagram:hover {
-            color: #e1306c;
+            color: white;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888) !important;
+            border-color: transparent !important;
         }
         
         .github:hover {
-            color: #6e5494;
+            color: white;
+            background: #333 !important;
+            border-color: transparent !important;
         }
         
         .email:hover {
-            color: #3498db;
+            color: white;
+            background: #D44638 !important;
+            border-color: transparent !important;
         }
         
         .copyright {
-            margin-top: clamp(1rem, 2vw, 1.5rem);
-            color: #bdc3c7;
-            font-size: clamp(0.8rem, 2vw, 0.9rem);
-            line-height: 1.5;
+            margin-top: 1.5rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+            line-height: 1.7;
         }
         
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .navbar {
-                flex-direction: column;
-                gap: 0.5rem;
-                padding: 1rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .nav-title {
+                font-size: 1.25rem;
             }
             
             .container {
-                padding: 1.8rem;
+                padding: 1.75rem;
                 width: 95%;
             }
             
@@ -304,8 +580,8 @@
             }
 
             .modal-content {
-                width: 90%;
-                padding: 1.5rem;
+                width: 95%;
+                padding: 1.75rem;
                 margin: 10% auto;
             }
 
@@ -313,10 +589,69 @@
                 font-size: 1.5rem;
             }
         }
+        
+        /* Animation Classes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-fade {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Utility Classes */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Cyberpunk-inspired glitch effect (optional) */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        .glitch-effect {
+            animation: glitch 0.5s linear infinite;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .glitch-effect::before,
+        .glitch-effect::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+        }
+        
+        .glitch-effect::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--primary);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch-effect::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--warning);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
     </style>
 </head>
 <body>
-    <!-- Auto-Adjusting Navigation Bar -->
+    <!-- Glassmorphism Navigation Bar -->
     <nav class="navbar">
         <a href="#" class="navbar-brand">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="TruthScan Logo" class="logo">
@@ -324,21 +659,34 @@
         </a>
     </nav>
 
-    <!-- Centered Main Content -->
+    <!-- Main Content with Upload Section -->
     <main class="main-content">
-        <div class="container">
-            <h2>Upload Video or Image for Lie Detection</h2>
-            <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
-                <input type="file" name="file" required class="file-input">
-                <button type="submit" class="upload-btn">Upload</button>
+        <div class="container animate-fade">
+            <h2>Upload Video or Image for <span class="text-gradient">Lie Detection</span></h2>
+            <p class="subtitle" style="margin-bottom: 1.5rem; color: var(--gray);">Advanced AI-powered microexpression analysis with 98.7% accuracy</p>
+            
+            <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="upload-container">
+                <div class="file-input-wrapper">
+                    <label for="file-upload" class="file-input-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span class="text">Choose a file or drag it here</span>
+                        <span class="subtext">Supports MP4, MOV, JPG, PNG (Max 100MB)</span>
+                        <input type="file" id="file-upload" name="file" required class="file-input">
+                    </label>
+                    <div id="file-name" class="file-name"></div>
+                </div>
+                <button type="submit" class="upload-btn">
+                    <i class="fas fa-search"></i> Analyze for Deception
+                </button>
             </form>
+            
             <div id="loading-spinner">
-                <img src="{{ url_for('static', filename='images/spinner.gif') }}" alt="Loading...">
+                <div class="spinner"></div>
             </div>
         </div>
     </main>
 
-    <!-- Auto-Adjusting Footer -->
+    <!-- Gradient Footer with Social Links -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
@@ -362,16 +710,16 @@
             
             <p class="copyright">
                 &copy; 2025 TruthScan AI | Advanced Microexpression Analysis System<br>
-                All rights reserved
+                All rights reserved | Powered by Deep Learning and Computer Vision
             </p>
         </div>
     </footer>
 
-    <!-- About Modal -->
+    <!-- Modern Modals -->
     <div id="about-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('about-modal')">&times;</span>
-            <h2>About TruthScan</h2>
+            <button class="close-btn" onclick="closeModal('about-modal')">&times;</button>
+            <h2>About <span class="text-gradient">TruthScan</span></h2>
             <p>TruthScan is an advanced AI-powered deception detection platform that analyzes microexpressions and facial cues to identify potential dishonesty. Our cutting-edge technology provides professional-grade analysis for law enforcement, human resources, and security professionals.</p>
             
             <h3>Key Features</h3>
@@ -385,38 +733,67 @@
             
             <h3>Our Technology</h3>
             <p>Developed by a team of AI researchers and behavioral psychologists, TruthScan combines the latest in computer vision with established psychological principles to deliver reliable deception indicators.</p>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(6, 214, 160, 0.05); border-radius: 8px; border-left: 3px solid var(--primary);">
+                <p style="font-style: italic; color: var(--primary);">"The eyes can't hide what the face reveals. Our AI sees what humans often miss."</p>
+            </div>
         </div>
     </div>
 
-    <!-- How It Works Modal -->
     <div id="how-it-works-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('how-it-works-modal')">&times;</span>
-            <h2>How TruthScan Works</h2>
+            <button class="close-btn" onclick="closeModal('how-it-works-modal')">&times;</button>
+            <h2>How <span class="text-gradient">TruthScan</span> Works</h2>
             <p>TruthScan employs a sophisticated five-stage analysis process to evaluate potential deception:</p>
             
-            <h3>1. Media Input</h3>
-            <p>Upload video or image files through our secure interface. The system accepts most common formats including MP4, MOV, JPG, and PNG.</p>
-            
-            <h3>2. Face Detection & Tracking</h3>
-            <p>Our proprietary algorithms identify and isolate all faces in the media, maintaining tracking even with movement or partial obstructions.</p>
-            
-            <h3>3. Microexpression Analysis</h3>
-            <p>The system analyzes 68 facial landmarks at 30 frames per second to detect fleeting expressions lasting as little as 1/25th of a second.</p>
-            
-            <h3>4. Emotion Classification</h3>
-            <p>Using deep learning models trained on millions of samples, we classify expressions into seven core emotions with confidence scoring.</p>
-            
-            <h3>5. Deception Probability</h3>
-            <p>Our weighted algorithm combines all factors to generate a comprehensive deception probability score and detailed report.</p>
+            <div style="margin: 2rem 0; display: flex; flex-direction: column; gap: 1.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--primary); color: var(--darker); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">1</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0;">Media Input</h3>
+                        <p>Upload video or image files through our secure interface. The system accepts most common formats including MP4, MOV, JPG, and PNG.</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--primary); color: var(--darker); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">2</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0;">Face Detection & Tracking</h3>
+                        <p>Our proprietary algorithms identify and isolate all faces in the media, maintaining tracking even with movement or partial obstructions.</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--primary); color: var(--darker); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">3</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0;">Microexpression Analysis</h3>
+                        <p>The system analyzes 68 facial landmarks at 30 frames per second to detect fleeting expressions lasting as little as 1/25th of a second.</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--primary); color: var(--darker); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">4</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0;">Emotion Classification</h3>
+                        <p>Using deep learning models trained on millions of samples, we classify expressions into seven core emotions with confidence scoring.</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--primary); color: var(--darker); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">5</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0;">Deception Probability</h3>
+                        <p>Our weighted algorithm combines all factors to generate a comprehensive deception probability score and detailed report.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('privacy-modal')">&times;</span>
-            <h2>Privacy Policy</h2>
+            <button class="close-btn" onclick="closeModal('privacy-modal')">&times;</button>
+            <h2>Privacy <span class="text-gradient">Policy</span></h2>
             <p><strong>Last Updated:</strong> January 2025</p>
             
             <h3>1. Data Collection</h3>
@@ -442,14 +819,17 @@
                 <li>Access any information we hold about you</li>
                 <li>Withdraw consent for data processing</li>
             </ul>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(6, 214, 160, 0.05); border-radius: 8px;">
+                <p style="font-weight: 500;">For any privacy-related inquiries, please contact our Data Protection Officer at <a href="mailto:privacy@truthscan.ai">privacy@truthscan.ai</a></p>
+            </div>
         </div>
     </div>
 
-    <!-- Terms of Service Modal -->
     <div id="terms-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('terms-modal')">&times;</span>
-            <h2>Terms of Service</h2>
+            <button class="close-btn" onclick="closeModal('terms-modal')">&times;</button>
+            <h2>Terms of <span class="text-gradient">Service</span></h2>
             <p><strong>Effective Date:</strong> January 2025</p>
             
             <h3>1. Acceptance of Terms</h3>
@@ -475,36 +855,119 @@
             
             <h3>4. Disclaimer</h3>
             <p>TruthScan provides indicators, not proof. Always combine our analysis with other evidence and professional judgment.</p>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(239, 71, 111, 0.05); border-radius: 8px; border-left: 3px solid var(--warning);">
+                <p style="font-weight: 500; color: var(--warning);">Important: TruthScan results should not be used as sole evidence in legal proceedings. Consult with qualified professionals for critical decisions.</p>
+            </div>
         </div>
     </div>
 
-   
-
     <script>
-        const form = document.querySelector('form');
-        const spinner = document.getElementById('loading-spinner');
-    
-        form.addEventListener('submit', () => {
-            spinner.style.display = 'flex';
+        // File input handling
+        const fileInput = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileNameDisplay.textContent = `Selected: ${e.target.files[0].name}`;
+                fileNameDisplay.style.display = 'block';
+            } else {
+                fileNameDisplay.style.display = 'none';
+            }
         });
         
-        // Modal functions
+        // Form submission with loading spinner
+        const form = document.querySelector('form');
+        const spinner = document.getElementById('loading-spinner');
+        
+        form.addEventListener('submit', (e) => {
+            if (fileInput.files.length > 0) {
+                spinner.style.display = 'flex';
+            } else {
+                e.preventDefault();
+                alert('Please select a file to upload');
+            }
+        });
+        
+        // Enhanced Modal functions with animations
         function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Trigger reflow to enable animation
+            void modal.offsetWidth;
+            
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
         }
         
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            document.body.style.overflow = 'auto'; // Re-enable scrolling
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('show');
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
         
         // Close modal when clicking outside content
-        window.onclick = function(event) {
+        window.addEventListener('click', (event) => {
             if (event.target.className === 'modal') {
-                event.target.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                event.target.classList.remove('show');
+                
+                setTimeout(() => {
+                    event.target.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
             }
+        });
+        
+        // Drag and drop functionality
+        const dropArea = document.querySelector('.file-input-label');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.style.backgroundColor = 'rgba(6, 214, 160, 0.15)';
+            dropArea.style.borderColor = 'var(--accent)';
+        }
+        
+        function unhighlight() {
+            dropArea.style.backgroundColor = 'rgba(6, 214, 160, 0.05)';
+            dropArea.style.borderColor = 'var(--primary)';
+        }
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            
+            if (files.length > 0) {
+                fileNameDisplay.textContent = `Selected: ${files[0].name}`;
+                fileNameDisplay.style.display = 'block';
+            }
+            
+            unhighlight();
         }
     </script>
 </body>
