@@ -11,6 +11,7 @@ Pillow==10.0.0
 # Facial Recognition & Emotion Detection
 fer==22.5.1
 face-recognition==1.3.0
+dlib
 
 # Video Processing
 moviepy==1.0.3
